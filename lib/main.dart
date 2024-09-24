@@ -1,197 +1,105 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 
-void main() => runApp(const Banco());
+void main() => runApp(LoginApp());
 
-class Banco extends StatelessWidget {
-  const Banco({super.key});
-
+class LoginApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: ListaTransferencia(),
+      debugShowCheckedModeBanner: false,
+      home: LoginScreen(),
     );
   }
 }
 
-class FormularioTransferencia extends StatelessWidget {
-  final TextEditingController _controllerCampoNumeroConta =
-      TextEditingController();
-  final TextEditingController _controllerCampoValor = TextEditingController();
+class LoginScreen extends StatefulWidget {
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
 
-  FormularioTransferencia({super.key});
+class _LoginScreenState extends State<LoginScreen> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        //cololocar cor no texto Transferência
-        title: const Text(
-          "Nova Transferência",
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.blue,
+        title: Text('Welcome to The Cycles'),
       ),
-      body: Column(
-        children: [
-          Editor(
-              controlador: _controllerCampoNumeroConta,
-              rotulo: 'Numero da conta',
-              dica: '0000'),
-          Editor(
-              controlador: _controllerCampoValor,
-              rotulo: 'Valor',
-              dica: '0.00',
-              icone: Icons.monetization_on),
-          ElevatedButton(
-            onPressed: () {
-              _criarTransferencia(
-                context,
-                _controllerCampoNumeroConta,
-                _controllerCampoValor,
-              );
-            },
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(Colors.blue),
-            ),
-            child: const Text(
-              'Confirmar',
-              style: TextStyle(color: Colors.white, fontSize: 18),
-            ),
-          )
-        ],
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              TextFormField(
+                controller: _emailController,
+                decoration: InputDecoration(labelText: 'Email'),
+                keyboardType: TextInputType.emailAddress,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor, insira o email';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 16.0),
+              TextFormField(
+                controller: _passwordController,
+                decoration: InputDecoration(labelText: 'Senha'),
+                obscureText: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor, insira a senha';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 32.0),
+              ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState?.validate() ?? false) {
+                    // Ação de login (validação, autenticação, etc.)
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomeScreen()),
+                    
+                    );
+                  }
+                },
+                child: Text('Login'),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  void _criarTransferencia(
-      BuildContext context, controllerCampoNumeroConta, controllerCampoValor) {
-    debugPrint("Clicou em confirmar");
-    final int? numeroConta = int.tryParse(controllerCampoNumeroConta.text);
-    final double? valor = double.tryParse(controllerCampoValor.text);
-    if (numeroConta != null && valor != null) {
-      final transferenciaCriada = Transferencia(valor, numeroConta);
-      debugPrint('Criando transferência');
-      debugPrint('$transferenciaCriada');
-      Navigator.pop(context, transferenciaCriada);
-    }
-  }
-}
-
-class Editor extends StatelessWidget {
-  final TextEditingController? controlador;
-  final String? rotulo;
-  final String? dica;
-  final IconData? icone;
-
-  const Editor(
-      {super.key, this.controlador, this.rotulo, this.dica, this.icone});
-
   @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: TextField(
-        controller: controlador,
-        style: const TextStyle(fontSize: 24.0),
-        decoration: InputDecoration(
-          icon: icone != null
-              ? Icon(
-                  icone,
-                  color: Colors.green,
-                )
-              : null,
-          labelText: rotulo,
-          hintText: dica,
-        ),
-        keyboardType: TextInputType.number,
-      ),
-    );
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }
 
-class ListaTransferencia extends StatefulWidget {
-  final List<Transferencia> _transferencias = [];
-
-  ListaTransferencia({super.key});
-
-  @override
-  State<StatefulWidget> createState() {
-    // TODO: implement createState
-    return ListaTransferenciasState();
-  }
-}
-
-class ListaTransferenciasState extends State<ListaTransferencia> {
+class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        //cololocar cor no texto Transferência
-        title: const Text(
-          "Transferência",
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.blue,
+        title: Text('Home Screen'),
       ),
-      body: ListView.builder(
-          itemCount: widget._transferencias.length,
-          itemBuilder: (context, indice) {
-            final transferencia = widget._transferencias[indice];
-            return ItemTransferencia(transferencia);
-          }),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          final Future<Transferencia?> future =
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return FormularioTransferencia();
-          }));
-          future.then((transferenciaRecebida) {
-            debugPrint('chegou no then do future');
-            debugPrint('$transferenciaRecebida');
-            setState(() {
-              widget._transferencias.add(transferenciaRecebida!);
-            });
-          });
-        },
-        backgroundColor: Colors.blue,
-        child: const Icon(
-          Icons.add_circle_rounded,
-          size: 35,
-          color: Colors.white,
+      body: Center(
+        child: Text(
+          'Bem-vindo à Home Screen!',
+          style: TextStyle(fontSize: 24),
         ),
       ),
     );
-  }
-}
-
-class ItemTransferencia extends StatelessWidget {
-  final Transferencia _transferencia;
-
-  const ItemTransferencia(this._transferencia, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: ListTile(
-        leading: const Icon(Icons.monetization_on, color: Colors.green),
-        title: Text(_transferencia.valor.toString()),
-        subtitle: Text(_transferencia.numeroConta.toString()),
-      ),
-    );
-  }
-}
-
-class Transferencia {
-  final double valor; //
-  final int numeroConta;
-
-  Transferencia(this.valor, this.numeroConta);
-
-  @override
-  String toString() {
-    return 'Transferência{valor: $valor, numeroConta: $numeroConta}';
   }
 }
