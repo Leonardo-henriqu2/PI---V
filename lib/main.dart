@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 void main() => runApp(LoginApp());
@@ -90,16 +92,118 @@ class _LoginScreenState extends State<LoginScreen> {
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Pergunta Aleatória',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: PerguntaAleatoria(),
+    );
+  }
+}
+
+class PerguntaAleatoria extends StatefulWidget {
+  @override
+  _PerguntaAleatoriaState createState() => _PerguntaAleatoriaState();
+}
+
+class _PerguntaAleatoriaState extends State<PerguntaAleatoria> {
+  List<String> perguntas = [
+    'Qual é sua cor favorita?',
+    'Qual é o seu animal preferido?',
+    'Qual é o seu hobby favorito?',
+  ];
+
+  Map<String, List<String>> opcoes = {
+    'Qual é sua cor favorita?': ['Vermelho', 'Azul', 'Verde', 'Amarelo'],
+    'Qual é o seu animal preferido?': ['Cachorro', 'Gato', 'Pássaro', 'Peixe'],
+    'Qual é o seu hobby favorito?': [
+      'Leitura',
+      'Esportes',
+      'Jogos',
+      'Culinária'
+    ],
+  };
+
+  late String perguntaSelecionada;
+  late String respostaSelecionada;
+
+  @override
+  void initState() {
+    super.initState();
+    gerarPerguntaAleatoria();
+  }
+
+  void gerarPerguntaAleatoria() {
+    final random = Random();
+    setState(() {
+      perguntaSelecionada = perguntas[random.nextInt(perguntas.length)];
+      respostaSelecionada = opcoes[perguntaSelecionada]!.first;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home Screen'),
+        title: Text('Pergunta Aleatória'),
       ),
-      body: Center(
-        child: Text(
-          'Bem-vindo à Home Screen!',
-          style: TextStyle(fontSize: 24),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              perguntaSelecionada,
+              style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 20.0),
+            Column(
+              children: opcoes[perguntaSelecionada]!.map((opcao) {
+                return RadioListTile<String>(
+                  title: Text(opcao),
+                  value: opcao,
+                  groupValue: respostaSelecionada,
+                  onChanged: (valor) {
+                    setState(() {
+                      respostaSelecionada = valor!;
+                    });
+                  },
+                );
+              }).toList(),
+            ),
+            SizedBox(height: 20.0),
+            ElevatedButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: Text('Resposta Selecionada'),
+                      content: Text('Você escolheu: $respostaSelecionada'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text('OK'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              child: Text('Enviar Resposta'),
+            ),
+            SizedBox(height: 20.0),
+            ElevatedButton(
+              onPressed: gerarPerguntaAleatoria,
+              child: Text('Nova Pergunta'),
+            ),
+          ],
         ),
       ),
     );
   }
 }
+
