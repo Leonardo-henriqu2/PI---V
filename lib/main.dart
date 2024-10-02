@@ -93,7 +93,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Pergunta Aleatória',
+      title: 'Responda atentamente as questões',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -109,19 +109,19 @@ class PerguntaAleatoria extends StatefulWidget {
 
 class _PerguntaAleatoriaState extends State<PerguntaAleatoria> {
   List<String> perguntas = [
-    'Qual é sua cor favorita?',
-    'Qual é o seu animal preferido?',
-    'Qual é o seu hobby favorito?',
+    'Qual seu principal entretenimento no momento?',
+    'Qual gênero mais te representa?',
+    'Datas de lançamento de seu interesse?',
   ];
 
   Map<String, List<String>> opcoes = {
-    'Qual é sua cor favorita?': ['Vermelho', 'Azul', 'Verde', 'Amarelo'],
-    'Qual é o seu animal preferido?': ['Cachorro', 'Gato', 'Pássaro', 'Peixe'],
-    'Qual é o seu hobby favorito?': [
-      'Leitura',
-      'Esportes',
-      'Jogos',
-      'Culinária'
+    'Qual seu principal entretenimento no momento?': ['Livros', 'Filmes', 'Series', 'Animes'],
+    'Qual gênero mais te representa?': ['Ação e Aventura', 'Comédia Romântica', 'Animações em geral', 'Fatos Reais'],
+    'Datas de lançamento de seu interesse?': [
+      'anos 90',
+      '2000 a 2009',
+      '2010 a 2019',
+      '2020 a 2024'
     ],
   };
 
